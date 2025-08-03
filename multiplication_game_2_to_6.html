@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <title>九九乘法表遊戲（2～6）</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', 'Noto Sans TC', sans-serif;
+      text-align: center;
+      margin: 40px;
+      background-color: #fff8f0;
+      position: relative;
+    }
+    h1 {
+      color: #ff69b4;
+      font-size: 2.5rem;
+    }
+    .question {
+      font-size: 2.5rem;
+      margin: 30px;
+      color: #ff8c00;
+    }
+    input[type="number"] {
+      padding: 12px;
+      font-size: 1.5rem;
+      width: 120px;
+      text-align: center;
+      border-radius: 10px;
+      border: 2px solid #ffb6c1;
+    }
+    button {
+      padding: 12px 25px;
+      font-size: 1.2rem;
+      margin: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      background-color: #ffb6c1;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #ff69b4;
+    }
+    .result, .score {
+      margin-top: 20px;
+      font-size: 1.8rem;
+    }
+    .emoji {
+      font-size: 2rem;
+      margin-right: 10px;
+    }
+    .footer {
+      margin-top: 40px;
+      font-size: 1rem;
+      color: #888;
+    }
+    
+    
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+    .confetti {
+      animation: pop 0.5s ease forwards;
+    }
+    @keyframes pop {
+      0% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.5); opacity: 1; }
+      100% { transform: scale(1); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎉 九九乘法表遊戲（2～6） 🎉</h1>
+  <div class="question" id="question">請按下「下一題」開始</div>
+  <input type="number" id="answer" placeholder="你的答案" />
+  <div>
+    <button onclick="checkAnswer()">✅ 送出</button>
+    <button onclick="newQuestion()">➡️ 下一題</button>
+  </div>
+  <div class="result" id="result"></div>
+  <div class="score" id="score"></div>
+  
+  
+  
+  <div class="footer">設計 by Kenji 💡</div>
+
+  <script>
+    let currentA = 0;
+    let currentB = 0;
+    let correctCount = 0;
+    let totalCount = 0;
+
+    
+
+    function newQuestion() {
+      const tables = [2, 3, 4, 5, 6];
+      currentA = tables[Math.floor(Math.random() * tables.length)];
+      currentB = Math.floor(Math.random() * 9) + 1;
+      document.getElementById("question").innerText = `${currentA} × ${currentB} = ?`;
+      document.getElementById("answer").value = "";
+      document.getElementById("result").innerText = "";
+    }
+
+    function checkAnswer() {
+      const userAnswer = parseInt(document.getElementById("answer").value);
+      const correct = currentA * currentB;
+      const resultEl = document.getElementById("result");
+      totalCount++;
+
+      if (userAnswer === correct) {
+        correctCount++;
+        
+        resultEl.innerHTML = "<span class='emoji confetti'>🎯🎉</span>✅ 答對了！";
+        resultEl.style.color = "green";
+      } else {
+        
+        resultEl.innerHTML = `<span class='emoji'>😿</span>❌ 答錯了，正確答案是 ${correct}`;
+        resultEl.style.color = "red";
+      }
+
+      if (totalCount % 10 === 0) {
+        const scoreEl = document.getElementById("score");
+        scoreEl.innerHTML = `🌟 你答對了 <strong>${correctCount}</strong> 題，共 <strong>${totalCount}</strong> 題。<br>🎓 得分：<strong>${Math.round((correctCount / totalCount) * 100)}%</strong>`;
+      }
+    }
+  </script>
+</body>
+</html>
