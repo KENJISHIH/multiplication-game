@@ -58,6 +58,11 @@
     .confetti {
       animation: pop 0.5s ease forwards;
     }
+    .reaction-img {
+      width: 25vw;
+      max-width: 120px;
+      margin-top: 3vw;
+    }
     @keyframes pop {
       0% { transform: scale(1); opacity: 0.5; }
       50% { transform: scale(1.5); opacity: 1; }
@@ -83,6 +88,7 @@
     let currentA = 0;
     let currentB = 0;
     let correctCount = 0;
+    let streak = 0;
     const correctSound = document.getElementById("correct-sound");
     const wrongSound = document.getElementById("wrong-sound");
     let totalCount = 0;
@@ -102,14 +108,23 @@
       const resultEl = document.getElementById("result");
       totalCount++;
 
+      resultEl.innerHTML = ""; // clear
+
       if (userAnswer === correct) {
         correctCount++;
+        streak++;
         correctSound.play();
         resultEl.innerHTML = "<span class='emoji confetti'>🎯🎉</span>✅ 答對了！";
         resultEl.style.color = "green";
+        if (streak === 3) {
+          resultEl.innerHTML += '<br><img src="OK.png" class="reaction-img" alt="ok" />';
+          streak = 0;
+        }
       } else {
         wrongSound.play();
+        streak = 0;
         resultEl.innerHTML = `<span class='emoji'>😿</span>❌ 答錯了，正確答案是 ${correct}`;
+        resultEl.innerHTML += '<br><img src="NO.png" class="reaction-img" alt="no" />';
         resultEl.style.color = "red";
       }
 
