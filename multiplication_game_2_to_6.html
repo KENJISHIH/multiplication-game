@@ -55,11 +55,6 @@
       font-size: 1rem;
       color: #888;
     }
-    
-    
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0); }
-    }
     .confetti {
       animation: pop 0.5s ease forwards;
     }
@@ -80,9 +75,8 @@
   </div>
   <div class="result" id="result"></div>
   <div class="score" id="score"></div>
-  
-  
-  
+  <audio id="correct-sound" src="correct.mp3"></audio>
+  <audio id="wrong-sound" src="wrong.mp3"></audio>
   <div class="footer">設計 by Kenji 💡</div>
 
   <script>
@@ -90,8 +84,8 @@
     let currentB = 0;
     let correctCount = 0;
     let totalCount = 0;
-
-    
+    const correctSound = document.getElementById("correct-sound");
+    const wrongSound = document.getElementById("wrong-sound");
 
     function newQuestion() {
       const tables = [2, 3, 4, 5, 6];
@@ -110,11 +104,11 @@
 
       if (userAnswer === correct) {
         correctCount++;
-        
+        correctSound.play();
         resultEl.innerHTML = "<span class='emoji confetti'>🎯🎉</span>✅ 答對了！";
         resultEl.style.color = "green";
       } else {
-        
+        wrongSound.play();
         resultEl.innerHTML = `<span class='emoji'>😿</span>❌ 答錯了，正確答案是 ${correct}`;
         resultEl.style.color = "red";
       }
