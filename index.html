@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
-  <title>九九乘法表遊戲（2～7）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>九九乘法表遊戲</title>
   <style>
     body {
       font-family: 'Segoe UI', 'Noto Sans TC', sans-serif;
@@ -74,6 +74,28 @@
       transform: scale(1.5);
       margin-right: 2vw;
     }
+    .number-button {
+      font-size: 5vw;
+      width: 9vw;
+      height: 9vw;
+      margin: 1vw;
+      border-radius: 2vw;
+      border: none;
+      background-color: #ccc;
+      color: #000;
+    }
+    .number-button.active {
+      background-color: #4caf50;
+      color: white;
+    }
+    .multiplication-selection {
+      margin-top: 10vw;
+      padding: 5vw;
+      border-radius: 3vw;
+      border: 3px solid #ffb3d1;
+      background-color: #ffe8f0;
+      display: inline-block;
+    }
     @keyframes pop {
       0% { transform: scale(1); opacity: 0.5; }
       50% { transform: scale(1.5); opacity: 1; }
@@ -82,8 +104,10 @@
   </style>
 </head>
 <body>
-  <h1>🎉 九九乘法表遊戲（2～7） 🎉</h1>
+  <h1>🎉 九九乘法表遊戲 🎉</h1>
+
   <div class="question" id="question">請按下「下一題」開始</div>
+
   <input type="number" id="answer" placeholder="你的答案" />
   <div>
     <button onclick="checkAnswer()">✅ 送出</button>
@@ -100,8 +124,19 @@
 
   <div class="result" id="result"></div>
   <div class="score" id="score"></div>
+
   <audio id="correct-sound" src="correct.mp3"></audio>
   <audio id="wrong-sound" src="wrong.mp3"></audio>
+
+  <!-- 圖片顯示區 -->
+  <img id="reaction-img" class="reaction-img" style="display:none;" />
+
+  <!-- 乘法選擇區 -->
+  <div class="multiplication-selection">
+    <div><strong>請選擇要練習的乘法（可複選）</strong></div>
+    <div id="tableButtons"></div>
+  </div>
+
   <div class="footer">設計 by Kenji 💡</div>
 
   <script>
@@ -112,23 +147,52 @@
     let streak = 0;
     let totalCount = 0;
     const maxQuestions = 20;
+    const selectedTables = new Set();
 
     const correctSound = document.getElementById("correct-sound");
     const wrongSound = document.getElementById("wrong-sound");
+    const reactionImg = document.getElementById("reaction-img");
 
-    document.getElementById("answer").addEventListener("keyup", function (event) {
-      if (event.key === "Enter") {
-        checkAnswer();
+    // 預設勾選 2~7
+    document.addEventListener("DOMContentLoaded", () => {
+      const container = document.getElementById("tableButtons");
+      for (let i = 2; i <= 9; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.className = "number-button";
+        if (i >= 2 && i <= 7) {
+          selectedTables.add(i);
+          btn.classList.add("active");
+        }
+        btn.onclick = function () {
+          if (selectedTables.has(i)) {
+            selectedTables.delete(i);
+            btn.classList.remove("active");
+          } else {
+            selectedTables.add(i);
+            btn.classList.add("active");
+          }
+        };
+        container.appendChild(btn);
       }
     });
 
+    document.getElementById("answer").addEventListener("keyup", function (event) {
+      if (event.key === "Enter") checkAnswer();
+    });
+
     function newQuestion() {
-      const tables = [2, 3, 4, 5, 6, 7];
+      if (selectedTables.size === 0) {
+        alert("請先選擇至少一個乘法表！");
+        return;
+      }
+      const tables = Array.from(selectedTables);
       currentA = tables[Math.floor(Math.random() * tables.length)];
       currentB = Math.floor(Math.random() * 9) + 1;
       document.getElementById("question").innerText = `${currentA} × ${currentB} = ?`;
       document.getElementById("answer").value = "";
       document.getElementById("result").innerText = "";
+      reactionImg.style.display = "none";
     }
 
     function checkAnswer() {
@@ -137,9 +201,10 @@
       const resultEl = document.getElementById("result");
       const scoreEl = document.getElementById("score");
       const autoNext = document.getElementById("autoNext").checked;
-      totalCount++;
 
+      totalCount++;
       resultEl.innerHTML = "";
+      reactionImg.style.display = "none";
 
       if (userAnswer === correct) {
         correctCount++;
@@ -147,16 +212,19 @@
         correctSound.play();
         resultEl.innerHTML = "<span class='emoji confetti'>🎯🎉</span>✅ 答對了！";
         resultEl.style.color = "green";
+
         if (streak === 3) {
-          resultEl.innerHTML += '<br><img src="OK.png" class="reaction-img" alt="ok" />';
+          reactionImg.src = "OK.png";
+          reactionImg.style.display = "block";
           streak = 0;
         }
       } else {
         wrongCount++;
-        wrongSound.play();
         streak = 0;
+        wrongSound.play();
         resultEl.innerHTML = `<span class='emoji'>😿</span>❌ 答錯了，正確答案是 ${correct}`;
-        resultEl.innerHTML += '<br><img src="NO.png" class="reaction-img" alt="no" />';
+        reactionImg.src = "NO.png";
+        reactionImg.style.display = "block";
         resultEl.style.color = "red";
       }
 
@@ -176,9 +244,7 @@
       }
 
       if (autoNext) {
-        setTimeout(() => {
-          newQuestion();
-        }, 2000);
+        setTimeout(newQuestion, 2000);
       }
     }
 
@@ -189,6 +255,7 @@
       streak = 0;
       document.getElementById("answer").disabled = false;
       document.getElementById("score").innerHTML = "";
+      document.getElementById("reaction-img").style.display = "none";
       newQuestion();
     }
   </script>
