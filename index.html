@@ -67,6 +67,13 @@
       margin-top: 5vw;
       font-size: 5vw;
     }
+    input[type="checkbox"].large-checkbox {
+      width: 6vw;
+      height: 6vw;
+      vertical-align: middle;
+      transform: scale(1.5);
+      margin-right: 2vw;
+    }
     @keyframes pop {
       0% { transform: scale(1); opacity: 0.5; }
       50% { transform: scale(1.5); opacity: 1; }
@@ -81,12 +88,13 @@
   <div>
     <button onclick="checkAnswer()">✅ 送出</button>
     <button onclick="newQuestion()">➡️ 下一題</button>
+    <button onclick="restartGame()">🔁 重新開始</button>
   </div>
 
   <div class="auto-next-toggle">
     <label>
-      <input type="checkbox" id="autoNext" />
-      每題顯示後自動跳下一題（3秒）
+      <input type="checkbox" id="autoNext" class="large-checkbox" />
+      每題顯示後自動跳下一題（2秒）
     </label>
   </div>
 
@@ -103,8 +111,16 @@
     let wrongCount = 0;
     let streak = 0;
     let totalCount = 0;
+    const maxQuestions = 20;
+
     const correctSound = document.getElementById("correct-sound");
     const wrongSound = document.getElementById("wrong-sound");
+
+    document.getElementById("answer").addEventListener("keyup", function (event) {
+      if (event.key === "Enter") {
+        checkAnswer();
+      }
+    });
 
     function newQuestion() {
       const tables = [2, 3, 4, 5, 6, 7];
@@ -144,7 +160,7 @@
         resultEl.style.color = "red";
       }
 
-      if (totalCount % 10 === 0) {
+      if (totalCount % 10 === 0 || totalCount >= maxQuestions) {
         scoreEl.innerHTML = `
           🌟 你答對了 <strong>${correctCount}</strong> 題，
           答錯了 <strong>${wrongCount}</strong> 題，
@@ -153,12 +169,27 @@
         `;
       }
 
-      // ✅ 自動跳下一題
+      if (totalCount >= maxQuestions) {
+        document.getElementById("question").innerText = "🎉 遊戲結束，恭喜完成挑戰！";
+        document.getElementById("answer").disabled = true;
+        return;
+      }
+
       if (autoNext) {
         setTimeout(() => {
           newQuestion();
-        }, 3000);
+        }, 2000);
       }
+    }
+
+    function restartGame() {
+      correctCount = 0;
+      totalCount = 0;
+      wrongCount = 0;
+      streak = 0;
+      document.getElementById("answer").disabled = false;
+      document.getElementById("score").innerHTML = "";
+      newQuestion();
     }
   </script>
 </body>
