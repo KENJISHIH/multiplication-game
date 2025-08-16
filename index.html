@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
-  <title>九九乘法表遊戲（2～6）</title>
+  <title>九九乘法表遊戲（2～7）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
@@ -63,6 +63,10 @@
       max-width: 120px;
       margin-top: 3vw;
     }
+    .auto-next-toggle {
+      margin-top: 5vw;
+      font-size: 5vw;
+    }
     @keyframes pop {
       0% { transform: scale(1); opacity: 0.5; }
       50% { transform: scale(1.5); opacity: 1; }
@@ -78,6 +82,14 @@
     <button onclick="checkAnswer()">✅ 送出</button>
     <button onclick="newQuestion()">➡️ 下一題</button>
   </div>
+
+  <div class="auto-next-toggle">
+    <label>
+      <input type="checkbox" id="autoNext" />
+      每題顯示後自動跳下一題（3秒）
+    </label>
+  </div>
+
   <div class="result" id="result"></div>
   <div class="score" id="score"></div>
   <audio id="correct-sound" src="correct.mp3"></audio>
@@ -88,13 +100,14 @@
     let currentA = 0;
     let currentB = 0;
     let correctCount = 0;
+    let wrongCount = 0;
     let streak = 0;
+    let totalCount = 0;
     const correctSound = document.getElementById("correct-sound");
     const wrongSound = document.getElementById("wrong-sound");
-    let totalCount = 0;
 
     function newQuestion() {
-      const tables = [2, 3, 4, 5, 6, 7,];
+      const tables = [2, 3, 4, 5, 6, 7];
       currentA = tables[Math.floor(Math.random() * tables.length)];
       currentB = Math.floor(Math.random() * 9) + 1;
       document.getElementById("question").innerText = `${currentA} × ${currentB} = ?`;
@@ -106,9 +119,11 @@
       const userAnswer = parseInt(document.getElementById("answer").value);
       const correct = currentA * currentB;
       const resultEl = document.getElementById("result");
+      const scoreEl = document.getElementById("score");
+      const autoNext = document.getElementById("autoNext").checked;
       totalCount++;
 
-      resultEl.innerHTML = ""; // clear
+      resultEl.innerHTML = "";
 
       if (userAnswer === correct) {
         correctCount++;
@@ -121,6 +136,7 @@
           streak = 0;
         }
       } else {
+        wrongCount++;
         wrongSound.play();
         streak = 0;
         resultEl.innerHTML = `<span class='emoji'>😿</span>❌ 答錯了，正確答案是 ${correct}`;
@@ -129,8 +145,19 @@
       }
 
       if (totalCount % 10 === 0) {
-        const scoreEl = document.getElementById("score");
-        scoreEl.innerHTML = `🌟 你答對了 <strong>${correctCount}</strong> 題，共 <strong>${totalCount}</strong> 題。<br>🎓 得分：<strong>${Math.round((correctCount / totalCount) * 100)}%</strong>`;
+        scoreEl.innerHTML = `
+          🌟 你答對了 <strong>${correctCount}</strong> 題，
+          答錯了 <strong>${wrongCount}</strong> 題，
+          共 <strong>${totalCount}</strong> 題。<br>
+          🎓 得分：<strong>${Math.round((correctCount / totalCount) * 100)}%</strong>
+        `;
+      }
+
+      // ✅ 自動跳下一題
+      if (autoNext) {
+        setTimeout(() => {
+          newQuestion();
+        }, 3000);
       }
     }
   </script>
