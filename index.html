@@ -146,6 +146,7 @@
     let correctCount = 0;
     let wrongCount = 0;
     let streak = 0;
+    let showTenCorrectImage = false; // ✅ 新增這行
     let totalCount = 0;
     const maxQuestions = 20;
     const selectedTables = new Set();
@@ -194,7 +195,15 @@
       document.getElementById("question").innerText = `${currentA} × ${currentB} = ?`;
       document.getElementById("answer").value = "";
       document.getElementById("result").innerText = "";
+      document.getElementById("score").innerHTML = ""; // ✅ 加在這裡
+
+      if (showTenCorrectImage) {
       reactionImg.style.display = "none";
+      showTenCorrectImage = false;
+      } else if (!showWrongImageUntilCorrect) {
+      reactionImg.style.display = "none";
+      }
+
     }
 
     function checkAnswer() {
@@ -209,6 +218,12 @@
       reactionImg.style.display = "none";
 
       if (userAnswer === correct) {
+    
+        if (showWrongImageUntilCorrect) {
+          reactionImg.style.display = "none";
+          showWrongImageUntilCorrect = false;
+        }    
+    
         correctCount++;
         streak++;
         correctSound.play();
@@ -224,6 +239,7 @@
           reactionImg.src = "10-correct.png";
           reactionImg.style.display = "block";
           levelUpSound.play();
+          showTenCorrectImage = true; // ✅ 加上這行
         }
       } else {
         wrongCount++;
@@ -237,6 +253,7 @@
         if (wrongCount > 0 && wrongCount % 5 === 0) {
           reactionImg.src = "5-wrong.png";
           reactionImg.style.display = "block";
+          showWrongImageUntilCorrect = true; // ✅ 新增這行  
         }
       }
 
