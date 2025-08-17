@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -127,11 +128,11 @@
 
   <audio id="correct-sound" src="correct.mp3"></audio>
   <audio id="wrong-sound" src="wrong.mp3"></audio>
+  <audio id="level-up-sound" src="mixkit-game-experience-level-increased-2062.wav"></audio>
+  <audio id="finish-sound" src="mixkit-game-level-completed-2059.wav"></audio>
 
-  <!-- 圖片顯示區 -->
   <img id="reaction-img" class="reaction-img" style="display:none;" />
 
-  <!-- 乘法選擇區 -->
   <div class="multiplication-selection">
     <div><strong>請選擇要練習的乘法（可複選）</strong></div>
     <div id="tableButtons"></div>
@@ -151,9 +152,10 @@
 
     const correctSound = document.getElementById("correct-sound");
     const wrongSound = document.getElementById("wrong-sound");
+    const levelUpSound = document.getElementById("level-up-sound");
+    const finishSound = document.getElementById("finish-sound");
     const reactionImg = document.getElementById("reaction-img");
 
-    // 預設勾選 2~7
     document.addEventListener("DOMContentLoaded", () => {
       const container = document.getElementById("tableButtons");
       for (let i = 2; i <= 9; i++) {
@@ -216,7 +218,12 @@
         if (streak === 3) {
           reactionImg.src = "OK.png";
           reactionImg.style.display = "block";
-          streak = 0;
+        }
+
+        if (streak === 10) {
+          reactionImg.src = "10-correct.png";
+          reactionImg.style.display = "block";
+          levelUpSound.play();
         }
       } else {
         wrongCount++;
@@ -226,6 +233,11 @@
         reactionImg.src = "NO.png";
         reactionImg.style.display = "block";
         resultEl.style.color = "red";
+
+        if (wrongCount > 0 && wrongCount % 5 === 0) {
+          reactionImg.src = "5-wrong.png";
+          reactionImg.style.display = "block";
+        }
       }
 
       if (totalCount % 10 === 0 || totalCount >= maxQuestions) {
@@ -240,6 +252,7 @@
       if (totalCount >= maxQuestions) {
         document.getElementById("question").innerText = "🎉 遊戲結束，恭喜完成挑戰！";
         document.getElementById("answer").disabled = true;
+        finishSound.play();
         return;
       }
 
